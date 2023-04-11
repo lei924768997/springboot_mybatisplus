@@ -1,0 +1,27 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://localhost:3306/exam_1449?serverTimezone=Asia/Shanghai&characterEncoding=utf-8
+    username: root
+    password: leiming520
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    #关闭spring的启动日志
+  main:
+    banner-mode: off
+
+#mybatisplus的日志功能（sql打印）调试用
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    #关闭mybatisplus的启动日志
+  global-config:
+      banner: false
+      db-config:
+        #table-prefix:   ##配置实体类对应的表名的前缀
+        id-type: assign_id  #配置实体类中的ID时自动生成的雪花ID
+        logic-delete-field: deleted
+        logic-delete-value: 1
+        logic-not-delete-value: 0
