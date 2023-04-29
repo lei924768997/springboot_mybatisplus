@@ -1,19 +1,18 @@
 package com.mybatisplus;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.Query;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mybatisplus.entity.CrimeInfo;
-import com.mybatisplus.entity.CrimeInfoQuery;
 import com.mybatisplus.mapper.CrimeInfoMapper;
-import org.apache.ibatis.javassist.expr.NewArray;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import sun.tools.jar.Main;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +22,8 @@ class SpringbootMybatisplusApplicationTests {
 
     @Autowired
     private CrimeInfoMapper crimeInfoMapper;
+    @Autowired
+    private RedisTemplate<String,Object>  redisTemplate;
 
     /**
      * 基本的单表查询功能
@@ -149,7 +150,46 @@ class SpringbootMybatisplusApplicationTests {
         CrimeInfo c2 =  crimeInfoMapper.selectById(30L);
         c2.setCity("南京");
         crimeInfoMapper.updateById(c2);
+    }
 
+    /**
+     * redis学习   redisTemplate
+     */
+    @Test
+    public void redisTest(){
+        //set方法
+        //redisTemplate.opsForValue().set("name","lisi");
+        //delete方法
+        //redisTemplate.delete("name");
+
+        LambdaQueryWrapper<CrimeInfo> qw = new  LambdaQueryWrapper<CrimeInfo>();
+        qw.eq(CrimeInfo::getCity,"ROCKVILLE");
+        List<CrimeInfo> list =  crimeInfoMapper.selectList(qw);
+        redisTemplate.opsForValue().set("leiming:CrimeInfoList",list);
+    }
+
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+    private static final ObjectMapper mapper = new ObjectMapper();
+
+    /**
+     * redis学习   stringRedisTemplate
+     */
+    @Test
+    public void redisStringSerializer(){
+        try {
+            LambdaQueryWrapper<CrimeInfo> qw = new  LambdaQueryWrapper<CrimeInfo>();
+            qw.eq(CrimeInfo::getIncidentId,"201271826");
+            CrimeInfo c =  crimeInfoMapper.selectOne(qw);
+            String json  = mapper.writeValueAsString(c);
+            stringRedisTemplate.opsForValue().set("leiming:CrimeInfo",json);
+            String a = stringRedisTemplate.opsForValue().get("leiming:CrimeInfo");
+            System.out.println(a);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
 
     }
 }
