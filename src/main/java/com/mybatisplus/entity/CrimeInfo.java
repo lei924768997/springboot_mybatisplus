@@ -2,17 +2,12 @@ package com.mybatisplus.entity;
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
+import java.util.List;
 
-/**
- * @ClassName
- * @Author: leiming
- * @Description:
- * @Date: 2023/4/9 14:07
- * @Version 1.0.0
- */
 /*和数据库的字段进行映射
 @TableField("incident_id")
 
@@ -26,8 +21,17 @@ select = false 代表查询数据库时，默认这个字段不做查询
 @TableId(type = IdType.ASSIGN_ID)
 */
 
+
+/**
+ * @ClassName
+ * @Author: leiming
+ * @Description:
+ * @Date: 2023/4/9 14:07
+ * @Version 1.0.0
+ */
 @Data
 @TableName("test1_data")
+@ToString
 public class CrimeInfo {
 
     private Long id;
@@ -61,4 +65,8 @@ public class CrimeInfo {
     //乐观锁，从1开始   需要添加拦截器
     @Version
     private Integer version;
+
+    private List<User> users;
+
+    private Student student;
 }

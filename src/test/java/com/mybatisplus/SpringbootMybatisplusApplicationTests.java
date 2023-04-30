@@ -8,12 +8,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mybatisplus.entity.CrimeInfo;
 import com.mybatisplus.mapper.CrimeInfoMapper;
+import org.apache.commons.beanutils.BeanUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -191,5 +193,30 @@ class SpringbootMybatisplusApplicationTests {
             e.printStackTrace();
         }
 
+    }
+
+    @Test
+    public void testMybatis(){
+
+        List<CrimeInfo> list =   crimeInfoMapper.queryListByIncidentId("201271826");
+        list.stream().forEach(l->{
+
+               System.out.println(l);
+
+        });
+    }
+
+    @Test
+    public void test11(){
+
+        CrimeInfo crimeInfo = new CrimeInfo();
+        CrimeInfo c = new CrimeInfo();
+        try {
+            BeanUtils.copyProperties(c,crimeInfo);  //对象之前的属性拷贝  将c拷贝到crimeInfo
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
     }
 }

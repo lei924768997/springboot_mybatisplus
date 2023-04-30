@@ -11,15 +11,15 @@ spring:
     #关闭spring的启动日志
   main:
     banner-mode: off
-  redis:
-    host: 127.0.0.1
-    port: 6379
-    lettuce:
-      pool:
-        max-active: 8
-        max-idle: 8
-        min-idle: 0
-        max-wait: 100ms
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: 100ms
 
 #mybatisplus的日志功能（sql打印）调试用
 mybatis-plus:
@@ -34,3 +34,4 @@ mybatis-plus:
         logic-delete-field: deleted
         logic-delete-value: 1
         logic-not-delete-value: 0
+  mapper-locations: classpath*:/mapper/*.xml
