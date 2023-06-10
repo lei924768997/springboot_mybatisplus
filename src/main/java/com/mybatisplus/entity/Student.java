@@ -16,14 +16,11 @@ import lombok.ToString;
 @TableName("tab_student")
 public class Student {
 
-    private Long id;
+    private String username;
 
-    private String name;
+    private String password;
 
-    private String sex;
+    private Integer age;
 
-    private String book;
-
-    private String school;
 
 }

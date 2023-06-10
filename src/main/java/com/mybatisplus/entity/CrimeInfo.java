@@ -2,6 +2,7 @@ package com.mybatisplus.entity;
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -32,7 +33,8 @@ select = false 代表查询数据库时，默认这个字段不做查询
 @Data
 @TableName("test1_data")
 @ToString
-public class CrimeInfo {
+public class CrimeInfo implements  Comparable<CrimeInfo>{
+
 
     private Long id;
 
@@ -69,4 +71,19 @@ public class CrimeInfo {
     private List<User> users;
 
     private Student student;
+
+    /**
+     * @Author: leim
+     *   set集合是无序、不可重复、无索引的集合 (例如treeSet和hashSet )
+     *  可以实现自动排序（例如存入int和string）,
+     * 但是当存入自定义对象时，是需要实现Comparable接口 重写其中的compareTo()方法的，
+     * 因为自动排序的关系，是需要比较的，所以需要对自定义对象进行设置
+     * @date: 2023/6/10
+     **/
+    @Override
+    public int compareTo(CrimeInfo o) {
+        return 0;//返回0时代表返回第一个元素
+        //return -1;  返回-1代表排序方式是倒序
+        //return 1; 返回1代表排序方式是正序
+    }
 }

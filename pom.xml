@@ -18,6 +18,7 @@
     </properties>
     <dependencies>
 
+
         <!-- jsr303的检验 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

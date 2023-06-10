@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mybatisplus.entity.CrimeInfo;
+import com.mybatisplus.entity.Student;
+import com.mybatisplus.exception.MyException;
 import com.mybatisplus.mapper.CrimeInfoMapper;
 import org.apache.commons.beanutils.BeanUtils;
 import org.junit.jupiter.api.Test;
@@ -14,10 +16,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.util.DigestUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @SpringBootTest
 class SpringbootMybatisplusApplicationTests {
@@ -219,4 +236,311 @@ class SpringbootMybatisplusApplicationTests {
             e.printStackTrace();
         }
     }
+
+    /**
+     * 文件的读取和写入  读取一个文件，将文件写成多个块
+     */
+   @Test
+    public void  readAndWrite() throws IOException{
+       //需要读取文件的路径
+       File readFile = new File("E:\\admin\\ttt.xlsx");
+       //需要写入文件的路径
+        File writeFile = new File("E:\\admin\\test");
+        if(!writeFile.exists()){
+
+            writeFile.mkdirs();
+        }
+        //创建分块的大小1M
+        int writeSize = 1024*1024*1;
+        //需要分成多少块
+        long writeNum =(long) Math.ceil(readFile.length()*1.0/writeSize);
+        //建立缓存区
+        byte[] num = new byte[1024];
+        //读取文件
+        RandomAccessFile read = new RandomAccessFile(readFile,"r");
+        for(long i = 0;i < writeNum;i++){
+            //把文件分成多个块
+            File file = new File("E:\\admin\\test\\" +i);
+            if(file.exists()){
+                file.delete();
+            }
+            boolean newfile = file.createNewFile();
+            if(newfile){
+                RandomAccessFile write = new RandomAccessFile(file,"rw");
+                int len = -1;
+                while((len = read.read(num)) != -1){
+                    write.write(num,0,len);
+                    if(file.length()>= writeSize){
+                        break;
+                    }
+                }
+                write.close();
+            }
+        }
+       read.close();
+     }
+
+    /**
+     * 将多个块的文件合并为一个文件
+     */
+    @Test
+    public void WriteAndRead()throws  IOException{
+
+        //源文件
+        File readFile = new File("E:\\admin\\ttt.xlsx");
+        //分块文件存储路径
+        File chunkFolderPath = new File("E:\\admin\\test\\");
+        if(!chunkFolderPath.exists()){
+
+            chunkFolderPath.mkdirs();
+        }
+        //定义合并后的文件名
+        File margeFlie = new File("E:\\admin\\ttt_1.xlsx");
+        //将分块文件分别读取出来，合并文件
+        File[] chunkFiles = chunkFolderPath.listFiles();
+        List<File> chunkFileList = Arrays.asList(chunkFiles);
+        Collections.sort(chunkFileList,new Comparator<File>(){
+
+            @Override
+            public int compare(File o1,File o2){
+
+                return Integer.parseInt(o1.getName())-Integer.parseInt(o2.getName());
+            }
+        });
+        byte[] b = new byte[1024];
+        RandomAccessFile write = new RandomAccessFile(margeFlie,"rw");
+        for(File file : chunkFileList){
+            RandomAccessFile read = new RandomAccessFile(file,"r");
+            int len = -1;
+            while((len=read.read(b)) != -1){
+
+                write.write(b,0,len);
+            }
+        }
+        FileInputStream sourceFile = new FileInputStream(readFile);
+        FileInputStream margeFile = new FileInputStream(margeFlie);
+        String sourceMd5 =  DigestUtils.md5DigestAsHex(sourceFile);
+        String margeMd5 =  DigestUtils.md5DigestAsHex(sourceFile);
+        if(sourceMd5.equals(margeMd5)){
+
+            System.out.println("合并成功    ");
+        }
+    }
+        /*
+         * stream流的处理
+         **/
+    @Test
+    public void test2(){
+
+        /*Stream<T> filter(Predicate<? super T> predicate)<R> Stream<R> map(Function<? super T, ? extends R> mapper);
+        Stream<T> distinct();Stream<T> sorted();Stream<T> sorted(Comparator<? super T> comparator);
+        Stream<T> peek(Consumer<? super T> action);
+        Stream<T> limit(long maxSize);Stream<T> skip(long n);*/
+
+        //获得前10个偶数
+        //Stream.iterate(0, t -> t + 2).limit(10).forEach(System.out::println);
+        //生成
+        //Stream.generate(Math::random).limit(10).forEach(System.out::println);
+
+        List<String> list = Arrays.asList("北京","北京","天津","东京","西京","普京");
+        //System.out.println(list.stream().count());
+        //找出集合中最大的
+        //Collections.max(list);
+        //找出集合中含有京的第一个元素
+        //System.out.println(list.stream().filter(item->item.contains("京")).findFirst());
+        //找出集合中含有京的集合
+        //System.out.println(list.stream().filter(item -> item.contains("京")).collect(Collectors.toList()));
+        //对集合中的元素去重
+        //list.stream().distinct().collect(Collectors.toList());
+        //截取元素，返回前2个元素
+        //list.stream().limit(2).collect(Collectors.toList());
+        //跳过n个元素
+        //list.stream().skip(2).collect(Collectors.toList());
+        List<Student> lists = getStudent();
+        //排序 默认不写是升序
+        //List<Student> collect = lists.stream().sorted(Comparator.comparing(Student::getAge)).collect(Collectors.toList());
+        //找出集合中密码中最大数字的对象
+        //lists.stream().max(Comparator.comparing(Student::getPassword)).get();
+        //List<String> str = new ArrayList<>();
+        //将list中的数据放在map中，toMap指定map的key和value
+        lists.stream().collect(Collectors.toMap(Student::getAge,Function.identity()));
+        //将name取出，重新放在一个集合中
+        //List<String> collect = lists.stream().map(Student::getUsername).collect(Collectors.toList());
+        //List<String> str = lists.stream().map(item -> item.getUsername()).collect(Collectors.toList());
+        //取出相同姓名的，放在集合中
+        //List<String> names = lists.stream().filter(bean -> str.contains(bean.getUsername())).map(Student::getUsername).collect(Collectors.toList());
+
+        List<String> newList = Arrays.asList("北 京 去","上 海 来","天 津 到","东 京 飞","西 京 想","普 京 牛 逼");
+        /*Stream<Stream<String>> streamStream = newList.stream()
+                                              .map(item -> item.split(" "))
+                                              .map(Arrays::stream);*/
+
+
+        //将上面的集合中的不相同的汉字列出来
+        List<String> collect1 = newList.stream()//转为流对象
+                .map(item -> item.split(" "))//将每个集合中的元素用空格分开，形成一个元素一个数组流Stream<Stream<String>>
+                .flatMap(Arrays::stream)//空格区分后，形成新的集合，
+                .distinct()//去重
+                .collect(Collectors.toList());//转为list
+        //lists.stream().flatMap(Student::getUsername).collect(Collectors.toList());
+
+    }
+        /**
+         * @Author: leim
+         * @Description    数组的api
+         * @date: 2023/5/27
+         **/
+    @Test
+    public void arraysTest(){
+
+        int[] arr = {1,3,5,2,4};
+        //数组排序
+        /*Arrays.sort(arr);
+        Arrays.stream(arr).forEach(item->System.out.println(item));*/
+        //toString()
+        System.out.println(Arrays.toString(arr));
+        //copyOf  将原数组数据复制到新数组中
+        int[] ints = Arrays.copyOf(arr, arr.length);
+        System.out.println(Arrays.toString(ints));
+    }
+
+    /**
+     * @Author: leim
+     * @Description      日期和时间的api
+     * @date: 2023/5/27
+     **/
+    @Test
+    public void dateTest(){
+
+        //年-月-日
+        LocalDate now = LocalDate.now();
+        //时-分-秒-毫秒
+        LocalTime.now();
+        //年-月-日  时-分-秒-毫秒
+        LocalDateTime now1 = LocalDateTime.now();
+        //取年月日
+        now1.toLocalDate();
+        //取时分秒
+        now1.toLocalTime();
+
+        //格式化时间
+        LocalDateTime now2 = LocalDateTime.now();
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        System.out.println(now2.format(format));
+
+        //字符串时间转为localDateTime
+        String s= "2023/05/27 10:20:43";
+        LocalDateTime parse = LocalDateTime.parse(s, format);
+        System.out.println(parse);
+        //plus方法 对时间进行加减
+        parse.plusDays(1);
+    }
+
+    /**
+     * @Author: leim
+     * @Description  自定义 运行时异常 throw:是主动抛异常    throws:是被动的抛异常
+     * @date: 2023/5/27
+     **/
+    @Test
+    public void exceptionTest() {
+        try {
+            String date = "2022/01/01";
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Date parse = sdf.parse(date);
+        } catch (Exception e) {
+
+            throw  new MyException("不能为空");
+        }
+    }
+
+    @Test
+    public void listTest(){
+
+        List<Object> list = new ArrayList<>();
+        list.add(111);
+        list.add("aaa");
+        list.add("ccc");
+        list.add(true);
+        list.add(222);
+
+        //迭代器遍历
+        Iterator<Object> iterator = list.iterator();
+        while(iterator.hasNext()){
+            Object next = iterator.next();
+            System.out.println(next);
+        }
+        //java1.8新特性，removeIf方法是按照条件删除集合的元素，需要重写接口Predicate的test的方法，
+        //return t instanceof  Integer; 代表t的真实类型是Integer的话，返回就是true，代表删除集合中的Integer类型的元素
+        //removeIf的底层是循环list中的元素，判断满足条件就删除
+        list.removeIf(item->item instanceof Integer);//lambda表达式的写法
+        //实现接口的写法
+        list.removeIf(new Predicate<Object>(){
+           public boolean test(Object t){
+
+               return t instanceof  Integer;
+            }
+        });
+        System.out.println(list);
+    }
+
+
+    @Test
+    public void test3(){
+
+        List<String> list = Arrays.asList("北京","南京","天津","东京","西京","普京");
+
+        List<String> filterStrs = filterString(list, new Predicate<String>() {
+            @Override
+            public boolean test(String s) {
+                return s.contains("京");
+            }
+        });
+        System.out.println(filterStrs);
+
+        List<String> filterStrs1 = filterString(list,s -> s.contains("京"));
+        System.out.println(filterStrs1);
+
+    }
+
+
+    //根据给定的规则，过滤集合中的字符串。此规则由Predicate的方法决定
+    public List<String> filterString(List<String> list, Predicate<String> pre){
+
+        ArrayList<String> filterList = new ArrayList<>();
+
+        for(String s : list){
+            if(pre.test(s)){
+                filterList.add(s);
+            }
+        }
+
+        return filterList;
+
+    }
+
+    public List<Student> getStudent(){
+
+        List<Student> list = new ArrayList<>();
+        //定义三个用户对象
+        Student user1 = new Student();
+        user1.setUsername("张三");
+        user1.setPassword("123");
+        user1.setAge(3);
+        Student user2 = new Student();
+        user2.setUsername("李四");
+        user2.setPassword("3");
+        user2.setAge(6);
+        Student user3 = new Student();
+        user3.setUsername("王五");
+        user3.setPassword("2");
+        user3.setAge(2);
+        //添加用户到集合中
+        list.add(user1);
+        list.add(user2);
+        list.add(user3);
+
+        return list;
+    }
+
+
 }

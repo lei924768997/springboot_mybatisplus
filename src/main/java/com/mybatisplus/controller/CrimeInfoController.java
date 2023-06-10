@@ -40,6 +40,7 @@ public class CrimeInfoController {
     @RequestMapping(value="/crime",method = RequestMethod.POST)
     public Map<String,Object> insertCrimeInfo(@RequestBody String str, @RequestParam(value="token",required= true) String token){
 
+
         Map<String,Object> result = new HashMap();
         try {
             JSONObject jsonObject = new JSONObject();
