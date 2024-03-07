@@ -26,7 +26,7 @@
             <result column="idcard" property="idcard" />
             <result column="sex" property="sex" />
             <result column="create_time" property="createTime" />
-            <association property="student" javaType="com.mybatisplus.entity.Student"><!--  collection标签、jdbcType属性 是一对一的-->
+            <association property="student" javaType="com.mybatisplus.entity.Student"><!--  association标签、jdbcType属性 是一对一的-->
                 <result column="name" property="name"></result>
                 <result column="sex" property="sex"></result>
                 <result column="book" property="book"></result>

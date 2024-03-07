@@ -1,0 +1,29 @@
+一、消息补偿与幂等：
+    当消息被消费者消费失败，或者没有进行确认时，消息会重新回到消息队列，这叫消息补偿
+    从unack回到read状态
+为什么要消息补偿：
+    消费者在消费这个消息的时候，发生了异常，或者没有确认，意味着消息消费失败，消息要重新再次进行消费
+
+因为消息补偿，经常会出现消息幂等（每次操作，不管你操作多少次，任务结果都不会发生变化）。
+
+例如：消息的接受者
+     接收消息：
+        有可能要处理多个任务
+            1、插入数据库
+            2、保存日志
+        如果在处理消息的方法中，某个步骤发生错误，那么消息会回到消息队列，然后再次发给消息者，就会出现不断的报错，发生死循环
+        消息进行补偿，再次进行重试，而且重试很多次
+    为了处理这个问题，需要2个步骤
+    1、解决死循环问题 （见yml中配置的重试机制）
+    2、解决幂等的问题
+
+二、rabbitmq事务 完成消息的100%投递  见rabbitmq.transactional包下
+channel.txselect(); -- 开启事务
+channel.txcommit(); --提交事务
+channel.txrollback(); --回滚事务
+
+三、发布者确认  见rabbitmq.confirm包下
+channel.confirmSelect(); -- 开启消息确认模式
+channel.waitForConfirms(); --单条消息是否被确认
+channel.waitForConfirmsOrDie(); --批量确认   --缺点不知道哪条消息有异常
+channel.addConfirmListener(new com.rabbitmq.client.ConfirmListener()); --异步确认 --速度最快

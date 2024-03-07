@@ -10,18 +10,20 @@ import com.mybatisplus.entity.CrimeInfo;
 import com.mybatisplus.entity.Student;
 import com.mybatisplus.exception.MyException;
 import com.mybatisplus.mapper.CrimeInfoMapper;
+import com.mybatisplus.mapper.SysUserMapper;
+import com.mybatisplus.pojo.SysUser;
 import org.apache.commons.beanutils.BeanUtils;
+import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.util.DigestUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.awt.*;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -29,6 +31,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -43,6 +46,9 @@ class SpringbootMybatisplusApplicationTests {
     private CrimeInfoMapper crimeInfoMapper;
     @Autowired
     private RedisTemplate<String,Object>  redisTemplate;
+    
+    @Autowired
+    private SysUserMapper sysUserMapper;
 
     /**
      * 基本的单表查询功能
@@ -525,7 +531,7 @@ class SpringbootMybatisplusApplicationTests {
         Student user1 = new Student();
         user1.setUsername("张三");
         user1.setPassword("123");
-        user1.setAge(3);
+        user1.setAge(8);
         Student user2 = new Student();
         user2.setUsername("李四");
         user2.setPassword("3");
@@ -542,5 +548,150 @@ class SpringbootMybatisplusApplicationTests {
         return list;
     }
 
+    @Test
+    public void testDemo(){
 
+        List<String> newList = Arrays.asList("北 京 去","上 海 来","天 津 到","东 京 飞","西 京 想","普 京 牛 逼");
+
+        List<Student> student = getStudent();
+        /*student.sort(new Comparator<Student>() {
+            @Override
+            public int compare(Student o1, Student o2) {
+                return o1.getAge()-o2.getAge();
+            }
+        });*/
+         //student.sort(Comparator.comparing(Student::getAge));
+        student.stream().sorted(Comparator.comparing(Student::getAge));
+
+        student.stream().forEach(item->System.out.println(item));
+
+
+    }
+
+    @Test
+    public void testDG(){
+        System.out.println(getDG(5));
+    }
+
+    public int getDG(int num){
+        if(num ==0){
+            System.out.println("----");
+            return 1;
+        }
+        int b = num * getDG(num - 1);
+        System.out.println(num+"----" + b);
+        return  b;
+    }
+
+    @Test
+    public void testFile(){
+        try{
+            File file = new File("C:\\Users\\admin\\Desktop\\a");
+            if(!file.exists()){
+                file.mkdirs();
+            }
+            //getFile(file);//获取文件和子目录
+            //deletFile(file);//删除文件和子目录
+        }catch (Exception e){
+
+            e.printStackTrace();
+        }
+    }
+    /**
+     * @Author: leim
+     * @Description  获取文件夹下面的是.txt的文件，包含子目录下面的
+     * @date: 2023/6/24
+     **/
+    public void getFile(File file) {
+        if (file.isDirectory()) {
+            File[] files = file.listFiles();//获取文件下的所有文件包括子目录
+            for (File f : files) {
+                // f.isDirectory()  判断是否是文件夹
+                if (f.isFile()) {//判断是否是文件
+                    if (f.getName().endsWith(".txt")) {
+                        System.out.println(f.getName());
+                    }
+                } else {
+                    getFile(f);
+                }
+            }
+        }
+    }
+    /**
+     * @Author: leim
+     * @Description  删除指定文件夹下的所有文件和文件夹 包括本身
+     * @date: 2023/6/24
+     **/
+    public void deletFile(File file){
+        if(file.isDirectory()){
+            File[] files = file.listFiles();
+            for (File f: files) {
+                 if(f.isFile()){
+                     f.delete();
+                 }else{
+                     deletFile(f);
+                 }
+            }
+            file.delete();
+        }
+    }
+
+
+    /**
+     * @Author: leim
+     * @Description    相对于word和excel使用字符流读取和写入效率快些（其中包含汉字等）
+     *                  由于视频和图片底层都是字节，所以只能使用字节流对它们进行操作
+     *                  IO流
+     *                     流向
+     *                           输入流   读取数据    FileReader  父类：Reader
+     *                           输出流   写出数据    FileWriter  父类：Writer
+     *                      数据类型
+     *                           字节流
+     *                                  字节输入流  读取数据    InputStream
+     *                                  字节输出流  写出数据    OutputStream
+     *                           字符流
+     *                                  字符输入流  读取数据   Reader
+     *                                  字符输出流  写出数据   Writer
+     * @date: 2023/6/24
+     **/
+    @Test
+    public void testInputStream(){
+
+        try{
+             
+            FileReader fr = new FileReader("C:\\Users\\admin\\Desktop\\redis.txt");
+            FileWriter fw = new FileWriter("C:\\Users\\admin\\Desktop\\redisCopy.txt");
+            //一次读一个字符，读取到的字符不等于-1，代表读取到了数据
+            /*int len;
+            while((len = fr.read()) != -1){
+                fw.write(len);
+                fw.flush();
+            }*/
+
+            //一次读一个长度是1024的字符数组,，读取到的字符不等于-1，代表读取到了数据
+            int len;
+            char[] a = new char[1024];
+            while((len = fr.read(a)) != -1){
+                fw.write(a,0,len);
+                fw.flush();
+            }
+
+            fr.close();
+            fw.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
+     * @author leim
+     * @date 2024/2/23
+     * @description 注解的使用
+     */
+    @Test
+    public void test0223() {
+        SysUser sysUser = sysUserMapper.selectById("32041146735807370123");
+        System.out.println(sysUser);
+    }
 }

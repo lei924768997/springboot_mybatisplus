@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mybatisplus.mapper.SysUserMapper">
+
+    <resultMap id="BaseResultMap" type="com.mybatisplus.pojo.SysUser">
+            <result property="id" column="ID" jdbcType="VARCHAR"/>
+            <result property="userType" column="USER_TYPE" jdbcType="VARCHAR"/>
+            <result property="deptId" column="DEPT_ID" jdbcType="VARCHAR"/>
+            <result property="userCode" column="USER_CODE" jdbcType="VARCHAR"/>
+            <result property="userName" column="USER_NAME" jdbcType="VARCHAR"/>
+            <result property="pyCode" column="PY_CODE" jdbcType="VARCHAR"/>
+            <result property="wbCode" column="WB_CODE" jdbcType="VARCHAR"/>
+            <result property="gender" column="GENDER" jdbcType="VARCHAR"/>
+            <result property="password" column="PASSWORD" jdbcType="VARCHAR"/>
+            <result property="doctorRegNo" column="DOCTOR_REG_NO" jdbcType="VARCHAR"/>
+            <result property="ca1" column="CA1" jdbcType="VARCHAR"/>
+            <result property="ca2" column="CA2" jdbcType="VARCHAR"/>
+            <result property="idType" column="ID_TYPE" jdbcType="VARCHAR"/>
+            <result property="idNo" column="ID_NO" jdbcType="VARCHAR"/>
+            <result property="phone" column="PHONE" jdbcType="VARCHAR"/>
+            <result property="loginTime" column="LOGIN_TIME" jdbcType="TIMESTAMP"/>
+            <result property="retryTimes" column="RETRY_TIMES" jdbcType="DECIMAL"/>
+            <result property="pwdModifyTime" column="PWD_MODIFY_TIME" jdbcType="TIMESTAMP"/>
+            <result property="adminFlag" column="ADMIN_FLAG" jdbcType="CHAR"/>
+            <result property="createUser" column="CREATE_USER" jdbcType="VARCHAR"/>
+            <result property="createTime" column="CREATE_TIME" jdbcType="TIMESTAMP"/>
+            <result property="updateUser" column="UPDATE_USER" jdbcType="VARCHAR"/>
+            <result property="updateTime" column="UPDATE_TIME" jdbcType="TIMESTAMP"/>
+            <result property="version" column="VERSION" jdbcType="DECIMAL"/>
+            <result property="delFlag" column="DEL_FLAG" jdbcType="CHAR"/>
+            <result property="orgId" column="ORG_ID" jdbcType="VARCHAR"/>
+            <result property="userLevel" column="USER_LEVEL" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        ID,USER_TYPE,DEPT_ID,
+        USER_CODE,USER_NAME,PY_CODE,
+        WB_CODE,GENDER,PASSWORD,
+        DOCTOR_REG_NO,CA1,CA2,
+        ID_TYPE,ID_NO,PHONE,
+        LOGIN_TIME,RETRY_TIMES,PWD_MODIFY_TIME,
+        ADMIN_FLAG,CREATE_USER,CREATE_TIME,
+        UPDATE_USER,UPDATE_TIME,VERSION,
+        DEL_FLAG,ORG_ID,USER_LEVEL,
+        PHOTO,SIGNATURE
+    </sql>
+</mapper>

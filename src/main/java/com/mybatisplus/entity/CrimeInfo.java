@@ -76,14 +76,18 @@ public class CrimeInfo implements  Comparable<CrimeInfo>{
      * @Author: leim
      *   set集合是无序、不可重复、无索引的集合 (例如treeSet和hashSet )
      *  可以实现自动排序（例如存入int和string）,
-     * 但是当存入自定义对象时，是需要实现Comparable接口 重写其中的compareTo()方法的，
+     * 但是当存入自定义对象时，
+     * 1、是需要实现 自然排序Comparable接口 重写其中的compareTo()方法的
+     * 2、还可以使用比较器 Comparator ,在构造方法中传递Comparator对象
      * 因为自动排序的关系，是需要比较的，所以需要对自定义对象进行设置
      * @date: 2023/6/10
      **/
     @Override
     public int compareTo(CrimeInfo o) {
         return 0;//返回0时代表返回第一个元素
-        //return -1;  返回-1代表排序方式是倒序
-        //return 1; 返回1代表排序方式是正序
+        //return -1;  返回-1代表排序方式是倒序 （排序是按照插入集合的顺序进行排序）
+        //return 1; 返回1代表排序方式是正序（排序是按照插入集合的顺序进行排序）
     }
+
+
 }
