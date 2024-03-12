@@ -1,0 +1,23 @@
+MongoDB：
+     基于文档存储
+elasticSearch:
+     全文搜索引擎
+
+
+redis:
+     nosql数据库，基于键值对存储，存储在缓存中
+     默认数据库的数量是16个
+     5种数据类型:
+        String
+        List
+        Set
+        Zset
+        Hash
+        Bitmap(位图)：(0、1)统计在线人数 是否注册等
+        HypeLogLog：计算在线人数
+        GEO：地理信息
+     相关命令：
+        redis-benchmark.exe 测试redis在当前主机的性能
+        redis-server.exe redis.windows.conf   启动redis
+        redis-cli.exe   打开一个窗口，可以使用redis命令
+

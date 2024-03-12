@@ -40,6 +40,7 @@ public class Consumer {
                 channel.basicAck(envelope.getDeliveryTag(),false);
             }
         };
+        Thread thread;
         //接收消息  第二个参数是自动确认消息，收到消息就确认这条消息 false时需要确认消息
         channel.basicConsume(QUEUENAME, false, defaultConsumer);
     }

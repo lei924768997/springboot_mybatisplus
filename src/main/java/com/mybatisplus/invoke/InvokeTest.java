@@ -1,4 +1,4 @@
-package com.mybatisplus.entity;
+package com.mybatisplus.invoke;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;

@@ -1,10 +1,6 @@
-package com.mybatisplus.entity;
+package com.mybatisplus.thread;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @ClassName com.mybatisplus.entity

@@ -27,3 +27,24 @@ channel.confirmSelect(); -- 开启消息确认模式
 channel.waitForConfirms(); --单条消息是否被确认
 channel.waitForConfirmsOrDie(); --批量确认   --缺点不知道哪条消息有异常
 channel.addConfirmListener(new com.rabbitmq.client.ConfirmListener()); --异步确认 --速度最快
+
+四、死信队列
+"x-dead-letter-exchange" :死信交换机
+"x-dead-letter-routing-key" :死信交换机的路由key
+    发生的场景：
+        1、消息被拒绝（basic.reject / basic.nack）,并且requeue=false
+        2、消息过期
+        3、队列达到最大长度
+        4、秒杀中，有100w个请求，有1000个产品，保证每个人能买到，x-max-length=1000,其他消息如果不处理，就丢弃了，但是也可以处理（方式一般就是放入死信队列）
+        channel.basicAck(下标，boolean)//消息确认
+        channel.basicNack(下标，false,boolean)//消息拒绝
+
+五、延迟队列
+    场景：订单在十分钟中未支付，则需要取消订单
+       1、 "x-expires" :设置队列过期时间  单位：ms  注意：这个属性代表删除队列  不是队列中的消息
+       2、 "x-message-ttl":设置消息过期时间 单位：ms  注意：这个属性代表删除消息  不是队列
+       3、 //设置消息的过期时间为5秒，超时后，发送到延时队列
+        AMQP.BasicProperties.Builder builder = new AMQP.BasicProperties.Builder();
+        builder.expiration("5000");
+        AMQP.BasicProperties build = builder.build();
+

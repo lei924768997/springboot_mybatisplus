@@ -1,0 +1,16 @@
+1、线程的6种状态：
+    new      :创建线程
+    runnable :可运行
+    blocked  :阻塞
+    waiting  :等待
+    timed_waiting:超时等待
+    terminated  ：中断
+
+2、关键字 volatile   //多线程中 使用变量，需要加volatile
+   保证了内存可见
+   禁止指令重排
+
+3、单例模式
+    Spring中创建对象是单例模式
+    Runtime类中是单例模式
+    项目加载时，配置文件只被调用一次
